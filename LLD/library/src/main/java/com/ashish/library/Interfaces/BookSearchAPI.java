@@ -1,13 +1,13 @@
 package com.ashish.library.Interfaces;
 
-import com.ashish.library.Models.Book;
+import com.ashish.library.Models.BookItem;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public interface BookSearchAPI {
-    List<Book> searchByBookTitle(String bookTitle);
-    List<Book> searchByAuthorName(String authorName);
-    List<Book> searchBySubject(String Subject);
-    List<Book> searchByPublicationDate(LocalDate date);
+    List<BookItem> searchByBookTitle(String bookTitle);
+    List<BookItem> searchByAuthorName(String authorName);
+    List<BookItem> searchBySubject(String subject);
+    List<BookItem> searchByPublicationDate(LocalDate date);
 }

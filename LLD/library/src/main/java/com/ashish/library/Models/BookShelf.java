@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 @Getter
 public class BookShelf {
-    String bookId;
-    Integer count;
+    String shelfId;
+    String locationIdentifier;
 }

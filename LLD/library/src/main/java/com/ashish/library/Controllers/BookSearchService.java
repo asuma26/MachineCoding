@@ -2,7 +2,7 @@ package com.ashish.library.Controllers;
 
 import com.ashish.library.DataBase.BooksDatabase;
 import com.ashish.library.Interfaces.BookSearchAPI;
-import com.ashish.library.Models.Book;
+import com.ashish.library.Models.BookItem;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -14,22 +14,22 @@ public class BookSearchService implements BookSearchAPI {
     private BooksDatabase booksDatabase = BooksDatabase.getBooksDatabase();
 
     @Override
-    public List<Book> searchByBookTitle(String bookTitle) {
+    public List<BookItem> searchByBookTitle(String bookTitle) {
         return booksDatabase.getBooksByTitle(bookTitle);
     }
 
     @Override
-    public List<Book> searchByAuthorName(String authorName) {
+    public List<BookItem> searchByAuthorName(String authorName) {
         return booksDatabase.getBooksByAuthorName(authorName);
     }
 
     @Override
-    public List<Book> searchBySubject(String Subject) {
-        return booksDatabase.getBooksBySubject(Subject);
+    public List<BookItem> searchBySubject(String subject) {
+        return booksDatabase.getBooksBySubject(subject);
     }
 
     @Override
-    public List<Book> searchByPublicationDate(LocalDate date) {
+    public List<BookItem> searchByPublicationDate(LocalDate date) {
         return booksDatabase.getBooksByPublishDate(date);
     }
 }

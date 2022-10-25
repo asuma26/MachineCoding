@@ -1,17 +1,20 @@
 package com.ashish.library.DataBase;
 
 import com.ashish.library.Interfaces.BookRepository;
-import com.ashish.library.Models.Book;
+import com.ashish.library.Models.BookItem;
+import com.ashish.library.Models.Member;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class BooksDatabase implements BookRepository {
 
-    private Map<String, Book> bookStorage;
-    private Map<String, Integer> countOfBooks;
+    private Map<String, BookItem> bookStorage = new HashMap<>();;
+//    private Map<String, Integer> countOfBooks;
+    // Todo: do we need a reference storage to display books and then check for its storage in inventory storage ??
     private BooksDatabase(){}
 
     private static BooksDatabase booksDatabase;
@@ -25,67 +28,72 @@ public class BooksDatabase implements BookRepository {
 
 
     @Override
-    public List<Book> getBooksByTitle(String bookTitle) {
-        List<Book> listOfBooks;
-       listOfBooks = bookStorage.values().stream().filter(book -> book.getBookTitle()==bookTitle&&isPresentInInventory(book)).collect(Collectors.toList());
+    public List<BookItem> getBooksByTitle(String bookTitle) {
+        List<BookItem> listOfBooks;
+       listOfBooks = bookStorage.values().stream().filter(book -> book.getBookTitle()==bookTitle).collect(Collectors.toList());
        return  listOfBooks;
     }
 
     @Override
-    public List<Book> getBooksByAuthorName(String authorName) {
-        List<Book> listOfBooks;
-        listOfBooks = bookStorage.values().stream().filter(book -> book.getAuthorName()==authorName&&isPresentInInventory(book)).collect(Collectors.toList());
+    public List<BookItem> getBooksByAuthorName(String authorName) {
+        List<BookItem> listOfBooks;
+        listOfBooks = bookStorage.values().stream().filter(book -> book.getAuthors().contains(authorName)).collect(Collectors.toList());
         return  listOfBooks;
     }
 
     @Override
-    public List<Book> getBooksBySubject(String Subject) {
-        List<Book> listOfBooks;
-        listOfBooks = bookStorage.values().stream().filter(book -> book.getSubject()==Subject&&isPresentInInventory(book)).collect(Collectors.toList());
+    public List<BookItem> getBooksBySubject(String Subject) {
+        List<BookItem> listOfBooks;
+        listOfBooks = bookStorage.values().stream().filter(book -> book.getSubject()==Subject).collect(Collectors.toList());
         return  listOfBooks;
     }
 
     @Override
-    public List<Book> getBooksByPublishDate(LocalDate date) {
-        List<Book> listOfBooks;
-        listOfBooks = bookStorage.values().stream().filter(book -> book.getPublicationDate().isEqual(date)&&isPresentInInventory(book)).collect(Collectors.toList());
+    public List<BookItem> getBooksByPublishDate(LocalDate date) {
+        List<BookItem> listOfBooks;
+        listOfBooks = bookStorage.values().stream().filter(book -> book.getPublicationDate().isEqual(date)).collect(Collectors.toList());
         return  listOfBooks;
     }
 
     @Override
-    public boolean AddBookToStorage(Book book) {
+    public BookItem getBookById(String bookId) {
+        return bookStorage.get(bookId);
+    }
+
+    @Override
+    public boolean AddBookToStorage(BookItem book) {
         bookStorage.put(book.getBookId(),book);
-        countOfBooks.put(book.getBookId(),countOfBooks.getOrDefault(book.getBookId(),0)+1);
+//        countOfBooks.put(book.getBookId(),countOfBooks.getOrDefault(book.getBookId(),0)+1);
         return true;
     }
 
     @Override
-    public boolean removeBookFromStorage(Book book) {
-        if(doesBookExist(book)==false|| !isPresentInInventory(book)){
+    public boolean removeBookFromStorage(String bookId) {
+        if(doesBookExist(bookId)==false){
             return false;
         }
-        bookStorage.remove(book.getBookId());
-        countOfBooks.put(book.getBookId(),countOfBooks.get(book.getBookId())-1);
+        bookStorage.remove(bookId);
+//        countOfBooks.put(book.getBookId(),countOfBooks.get(book.getBookId())-1);
         return true;
     }
 
     @Override
-    public boolean modifyBookInStorage(Book book) {
-        if(doesBookExist(book)==false || !isPresentInInventory(book)){
+    public boolean modifyBookInStorage(BookItem book) {
+        if(doesBookExist(book.getBookId())==false){
             return false;
         }
         bookStorage.put(book.getBookId(),book);
         return  true;
     }
 
-    private boolean doesBookExist(Book book){
-        if(bookStorage.containsKey(book.getBookId())==false){
+    private boolean doesBookExist(String bookId){
+        if(bookStorage.containsKey(bookId)==false){
             return false;
         }
         return true;
     }
 
-    private boolean isPresentInInventory(Book book){
-        return countOfBooks.getOrDefault(book.getBookId(),0)==0?false:true;
-    }
+//    private boolean isPresentInInventory(BookItem book){
+//        return countOfBooks.getOrDefault(book.getBookId(),0)==0?false:true;
+//    }
 }

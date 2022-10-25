@@ -1,19 +1,23 @@
 package com.ashish.library.Interfaces;
 
-import com.ashish.library.Models.Book;
+import com.ashish.library.Models.BookItem;
+import com.ashish.library.Models.Member;
+import com.sun.tools.corba.se.idl.constExpr.BooleanOr;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public interface BookRepository {
-    List<Book> getBooksByTitle(String bookTitle);
-    List<Book> getBooksByAuthorName(String authorName);
-    List<Book> getBooksBySubject(String Subject);
-    List<Book> getBooksByPublishDate(LocalDate date);
-    boolean AddBookToStorage(Book book);
-    boolean removeBookFromStorage(Book book);
-    boolean modifyBookInStorage(Book book);
+    List<BookItem> getBooksByTitle(String bookTitle);
+    List<BookItem> getBooksByAuthorName(String authorName);
+    List<BookItem> getBooksBySubject(String Subject);
+    List<BookItem> getBooksByPublishDate(LocalDate date);
+    BookItem getBookById(String bookId);
+    boolean AddBookToStorage(BookItem book);
+    boolean removeBookFromStorage(String bookId);
+    boolean modifyBookInStorage(BookItem book);
 }
+
 
 
 // library (multiple library)
