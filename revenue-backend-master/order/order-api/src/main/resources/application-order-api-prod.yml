@@ -1,0 +1,161 @@
+### Rest Template props ###
+http:
+  enableTemplateRegistration: true
+  templates:
+    subscriptionHttpTemplate:
+      pool:
+        connection:
+          max: 200
+          maxPerHost: 200
+          validateAfterInActivity: 100
+          timeout: 2000
+          defaultKeepAliveTime: 500
+          closeIdleWaitTime: 500
+          socket:
+            timeout: 3000
+            factory:
+              type: both
+          request:
+            timeout: 1000
+    partnerNotifierTemplate:
+      pool:
+        connection:
+          max: 200
+          maxPerHost: 50
+          validateAfterInActivity: 100
+          timeout: 500
+          defaultKeepAliveTime: 500
+          closeIdleWaitTime: 500
+          socket:
+            timeout: 500
+            factory:
+              type: both
+          request:
+            timeout: 500
+
+###### Order Queue props #####
+order:
+  pooling:
+    queue:
+      placement:
+        enabled: true
+        name: wcf-production-order-placement.fifo
+        sqs:
+          messages:
+            extractor:
+              batchSize: 5
+              waitTimeInSeconds: 5
+          consumer:
+            delay: 5
+            delayTimeUnit: SECONDS
+          producer:
+            delayInSecond: 5
+      fulfilment:
+        enabled: true
+        name: wcf-production-order-fulfilment
+        sqs:
+          messages:
+            extractor:
+              batchSize: 5
+              waitTimeInSeconds: 5
+          consumer:
+            delay: 5
+            delayTimeUnit: SECONDS
+          producer:
+            delayInSecond: 5
+      notification:
+        enabled: true
+        name: wcf-production-order-notification
+        sqs:
+          messages:
+            extractor:
+              batchSize: 5
+              waitTimeInSeconds: 5
+          consumer:
+            delay: 5
+            delayTimeUnit: SECONDS
+          producer:
+            delayInSecond: 5
+      deferred:
+        enabled: true
+        name: wcf-production-deferred-orders-scheduler
+        sqs:
+          messages:
+            extractor:
+              batchSize: 5
+              waitTimeInSeconds: 10
+          consumer:
+            delay: 20
+            delayTimeUnit: SECONDS
+          producer:
+            delayInSecond: 180
+
+subscription:
+  pooling:
+    queue:
+      provision:
+        enabled: true
+        name: wcf-production-revenue-subscription
+        sqs:
+          producer:
+            delayInSecond: 1
+
+###### Cache Props #######
+cache:
+  enabled: true
+  mode: composite
+  ####### Redis Props #######
+  redis:
+    name: l2cache-dev
+    mode: cluster
+    cluster:
+      nodes: wcf-redis.8hya7e.clustercfg.aps1.cache.amazonaws.com:6379
+    cache:
+      ttl: 2
+      timeunit: minutes
+      usePrefix: false
+      cacheNullValues: false
+      keyPrefix: DEV
+    usePooling: true
+    enableJmx: false
+    jmxPrefix: dev
+    connection:
+      timeout: 1000
+      maxTotal: 200
+      minIdle: 50
+      maxIdle: 100
+  ####### Caffeine Props ######
+  caffeine:
+    metrics: true
+    nullable: false
+    eviction:
+      size:
+        initial: 10
+        maximum: 500
+      time:
+        fixed: true
+        expireAfterWrite: 2
+        expireAfterAccess: 2
+        timeunit: minutes
+      #cache.caffeine.eviction.reference.weakKeys=false
+      #cache.caffeine.eviction.reference.weakValues=false
+      #cache.caffeine.eviction.reference.softValues=false
+### deferred scheduler
+deferred:
+  orders:
+    offset:
+      day: 1
+
+#### Hystrix Props #####
+hystrix:
+  enabled: true
+  order:
+    commandGroupKey: manageOrder
+    placement:
+      commandKey: place
+      timeout: 300
+      errorPercentage: 10
+    fulfilment:
+      commandKey: fulfil
+      timeout: 500
+      errorPercentage: 10

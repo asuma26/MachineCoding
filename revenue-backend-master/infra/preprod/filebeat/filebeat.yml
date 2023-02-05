@@ -1,0 +1,184 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/capi/error/20*/*.log
+  fields: 
+    kafka_topic: capi-error-preprod
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/capi/data/20*/20*/*.logstashLogs.log*.0
+  fields:
+    kafka_topic: capi-logs-preprod
+  json.keys_under_root: true
+  tail_files: true
+  close_timeout: 10m
+
+- type: log
+  enabled: true
+  paths:
+    - /data/capi/data/20*/20*/*.transactionLogstashDump.log*.0
+  fields:
+    kafka_topic: capi-transaction-preprod
+  json.keys_under_root: true
+  tail_files: true
+  close_timeout: 10m
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/targeting/logstash/20*/*.log
+  fields: 
+    kafka_topic: wcf-ut-preprod
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /logs/wcf-external/logstash/20*/*.log
+  fields: 
+    kafka_topic: wcf-external-preprod
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/targeting/error/20*/*.log
+  fields: 
+    kafka_topic: wcf-ut-preprod
+    log_type: wcf-ut-error-preprod
+
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/sms/logstash/day=*/*.log
+  fields: 
+    kafka_topic: wcf-sms-preprod
+    log_type: wcf-sms-logs-preprod
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/sms/error/20*/*.log
+  fields: 
+    kafka_topic: wcf-sms-preprod
+    log_type: wcf-sms-error-preprod
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/vas/logstash/20*/*.log
+  fields: 
+    kafka_topic: vas-logs-preprod
+    log_type: vas-logs-preprod
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/vas/error/20*/*.log
+  fields: 
+    kafka_topic: vas-logs-preprod
+    log_type: vas-error-preprod
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /logs/rg-events/logstash/day=*/*.log
+  fields:
+    kafka_topic: wcf-revenue-analytics-preprod
+    log_type: wcf-revenue-analytics-logs-preprod
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /logs/payment/logstash/*/*.log
+  fields: 
+    kafka_topic: wcf-payment-preprod
+    log_type: wcf-payment-logs-preprod
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/payment/error/20*/*.log
+  fields: 
+    kafka_topic: wcf-payment-preprod
+    log_type: wcf-payment-error-preprod
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /logs/subscription/logstash/day=*/*.log
+  fields: 
+    kafka_topic: wcf-subscription-preprod
+    log_type: wcf-subscription-logs-preprod
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/subscription/error/20*/*.log
+  fields: 
+    kafka_topic: wcf-subscription-preprod
+    log_type: wcf-subscription-error-preprod
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/partner/error/20*/*.log
+  fields: 
+    kafka_topic: wcf-payment-partner-preprod
+    log_type: wcf-payment-partner-error-preprod
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /logs/partner/logstash/20*/*.log
+  fields: 
+    kafka_topic: wcf-payment-partner-preprod
+    log_type: wcf-payment-partner-logs-preprod
+  json.keys_under_root: true
+  tail_files: true
+
+processors:
+  - drop_fields:
+      fields: ["agent.ephemeral_id", "agent.hostname", "agent.id", "agent.type", "agent.version", "ecs.version", "input.type", "log.offset", "version"]
+
+output.kafka:
+  hosts: ["10.90.1.4:9092","10.90.0.112:9092","10.90.1.95:9092"]
+  topic: '%{[fields.kafka_topic]}'
+  partition.round_robin:
+    reachable_only: false
+  required_acks: 1
+  compression: gzip
+  max_message_bytes: 1000000  
+
+http.enabled: true
+http.host: 0.0.0.0

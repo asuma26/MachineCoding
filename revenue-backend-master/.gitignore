@@ -1,0 +1,13 @@
+target
+.idea
+logs.dir_IS_UNDEFINED
+*.iml
+.DS_Store
+build
+*.jks
+*.log
+/scripts/dist/
+/scripts/build/
+/scripts/revenue_jobs.egg-info/
+package-lock.json
+node_modules

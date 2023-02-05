@@ -1,0 +1,24 @@
+### revenue service apis root ###
+service:
+  subscription:
+    api:
+      root: https://subscription-staging.wynk.in
+
+
+
+######## lib-auth props #######
+security:
+  exempt:
+    paths: /actuator/**,/v2/api-docs,/swagger-resources/**,/swagger-ui.html,/webjars/**,/wynk/**
+
+#### logging props ####
+logging:
+  path: /tmp
+  path.analytics: /tmp/logs
+  level:
+    in.wynk.*: INFO
+
+cors:
+  allowed:
+    origins:
+      - '*'

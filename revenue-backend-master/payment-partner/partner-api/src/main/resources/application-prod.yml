@@ -1,0 +1,15 @@
+### revenue service apis root ###
+service:
+  subscription:
+    api:
+      root: http://subscription.wcf.internal
+
+
+cors:
+  allowed:
+    origins:
+      - '*'
+
+security:
+  exempt:
+    paths: /actuator/**

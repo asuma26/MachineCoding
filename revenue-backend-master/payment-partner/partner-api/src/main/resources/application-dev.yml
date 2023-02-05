@@ -1,0 +1,10 @@
+### revenue service apis root ###
+service:
+  subscription:
+    api:
+      root: http://subscription-staging.wcf.internal
+
+cors:
+  allowed:
+    origins:
+      - '*'

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false" scan="true" scanPeriod="30 seconds">
+    <springProperty name="ANALYTICS_LOG_PATH" source="logging.path.analytics"/>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>
+                <Pattern>%level %date [%thread] [%X{rid}] [%file:%line] %msg%n</Pattern>
+            </pattern>
+        </layout>
+    </appender>
+
+    <appender name="ERRORLOG"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <encoder class="in.wynk.logging.WynkErrorEncoder"/>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>
+                ${LOG_PATH:-/tmp}/logs/subscription/error/%d{yyyy-MM-dd,
+                aux}/subscription-error.${HOSTNAME}.%d{yyyy-MM-dd}.%i.log.gz
+            </fileNamePattern>
+            <maxHistory>90</maxHistory>
+            <maxFileSize>500MB</maxFileSize>
+        </rollingPolicy>
+    </appender>
+    <appender name="ASYNC_ERRORLOG"
+              class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="ERRORLOG"/>
+        <queueSize>10000</queueSize>
+        <neverBlock>true</neverBlock>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <appender name="FILE"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%level %date [%thread] [%X{rid}] [%file:%line] %msg%n</Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH:-/tmp}/logs/subscription/app/%d{yyyy-MM-dd,
+                aux}/subscription.${HOSTNAME}.%d{yyyy-MM-dd}.%i.log.gz
+            </fileNamePattern>
+            <maxHistory>90</maxHistory>
+            <maxFileSize>500MB</maxFileSize>
+        </rollingPolicy>
+    </appender>
+    <appender name="ASYNC_FILE"
+              class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="FILE"/>
+        <queueSize>10000</queueSize>
+        <neverBlock>true</neverBlock>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <!-- logstashLogs -->
+    <appender name="ANALYTIC_LOG_FILE"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%msg%n</Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${ANALYTICS_LOG_PATH:-/tmp}/subscription/logstash/day=%d{yyyy-MM-dd,
+                aux}/subscription-logstash.${HOSTNAME}.%d{yyyy-MM-dd}.%i.log.gz
+            </fileNamePattern>
+            <maxHistory>90</maxHistory>
+            <maxFileSize>500MB</maxFileSize>
+        </rollingPolicy>
+    </appender>
+    <appender name="ASYNC_ANALYTIC_LOG_FILE"
+              class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="ANALYTIC_LOG_FILE"/>
+        <queueSize>10000</queueSize>
+        <neverBlock>true</neverBlock>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <logger name="refreshInMemoryCache" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="msisdnIdentification" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="offerProvision" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="subscriptionEvent" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="notificationEvent" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="allProducts" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="allPartners" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="allPlans" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="allOffers" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="managePlans" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="managePlansTemp" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="purchasePlans" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="myPlans" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="eligiblePlans" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="activePlans" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="airtelEvent" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+
+    <logger name="subscriptionProvisionAsync" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+
+    <logger name="subscribePlan" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+
+    <logger name="unsubscribePlan" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+
+    <logger name="userActiveSegment" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="userActivePlan" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="userProfile" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="combinedPlans" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="renewalMigrationEvent" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="refreshSubscriptionPack" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="messageThresholdExceedEvent" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="subscriptionStatus" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+
+    <springProfile name="local">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ASYNC_FILE"/>
+            <appender-ref ref="ASYNC_ERRORLOG"/>
+        </root>
+    </springProfile>
+    <springProfile name="dev,preprod">
+        <root level="INFO">
+            <appender-ref ref="ASYNC_FILE"/>
+            <appender-ref ref="ASYNC_ERRORLOG"/>
+        </root>
+        <logger name="in.wynk" additivity="false" level="DEBUG">
+            <appender-ref ref="ASYNC_FILE"/>
+            <appender-ref ref="ASYNC_ERRORLOG"/>
+        </logger>
+    </springProfile>
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="ASYNC_FILE"/>
+            <appender-ref ref="ASYNC_ERRORLOG"/>
+        </root>
+    </springProfile>
+</configuration>

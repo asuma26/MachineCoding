@@ -1,0 +1,27 @@
+cassandra:
+  contactpoints: 10.40.12.218,10.40.12.174,10.40.12.193
+  port: 9042
+  keyspace: user_targeting
+  jmxEnabled: false
+  localDC: datacenter3
+
+app:
+  batch:
+    utJob:
+      consistencyLevel: ONE # Check ConsistencyLevel.java for possible values
+      chunks: 100
+      defaultTTL: 90
+      launcher:
+        concurrencyLimit: 20
+
+cloud:
+  aws:
+    stack:
+      auto: false
+    credentials:
+      accessKey:
+      secretKey:
+      instanceProfile: true
+      useDefaultAwsCredentialsChain: true
+    region:
+      static: ap-south-1

@@ -1,0 +1,204 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/capi/error/2020-*/*.log
+  fields: 
+    kafka_topic: capi-error
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/capi/data/2020-*/2020-*/*.logstashLogs.log*.0
+  fields:
+    kafka_topic: capi-logs
+  json.keys_under_root: true
+  tail_files: true
+  close_timeout: 10m
+
+- type: log
+  enabled: true
+  paths:
+    - /data/capi/data/2020-*/2020-*/*.transactionLogstashDump.log*.0
+  fields:
+    kafka_topic: capi-transaction
+  json.keys_under_root: true
+  tail_files: true
+  close_timeout: 10m
+
+- type: log
+  enabled: true
+  paths:
+    - /data/targeting/logstash/2020-*/*.log
+  fields: 
+    kafka_topic: wcf-ut
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/wcf-external/logstash/2020-*/*.log
+  fields: 
+    kafka_topic: wcf-external
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/targeting/error/2020-*/*.log
+  fields: 
+    kafka_topic: wcf-ut
+    log_type: wcf-ut-error
+
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/sms/logstash/day=*/*.log
+  fields: 
+    kafka_topic: wcf-sms
+    log_type: wcf-sms-logs
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/sms/error/2020-*/*.log
+  fields: 
+    kafka_topic: wcf-sms
+    log_type: wcf-sms-error
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/vas/logstash/2020-*/*.log
+  fields: 
+    kafka_topic: vas-logs
+    log_type: vas-logs
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/vas/error/2020-*/*.log
+  fields: 
+    kafka_topic: vas-logs
+    log_type: vas-error
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/rg-events/logstash/day=*/*.log
+  fields:
+    kafka_topic: wcf-revenue-analytics
+    log_type: wcf-revenue-analytics-logs
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/subscription/logstash/day=*/*.log
+  fields:
+    kafka_topic: wcf-subscription
+    log_type: wcf-subscription-logs
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/subscription/error/2020-*/*.log
+  fields:
+    kafka_topic: wcf-subscription
+    log_type: wcf-subscription-error
+  json.keys_under_root: true
+  tail_files: true
+  
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/payment/logstash/day=*/*.log
+  fields:
+    kafka_topic: wcf-payment
+    log_type: wcf-payment-logs
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/payment/error/2020-*/*.log
+  fields:
+    kafka_topic: wcf-payment
+    log_type: wcf-payment-error
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/thanks-segment/logstash/2020-*/*.log
+  fields: 
+    kafka_topic: wcf-thanks-segment
+    log_type: wcf-thanks-segment
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/thanks-segment/error/2020-*/*.log
+  fields: 
+    kafka_topic: wcf-thanks-segment
+    log_type: wcf-thanks-segment-error
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/partner/logstash/2020-*/*.log
+  fields: 
+    kafka_topic: wcf-payment-partner
+    log_type: wcf-payment-partner
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/partner/error/2020-*/*.log
+  fields: 
+    kafka_topic: wcf-payment-partner
+    log_type: wcf-payment-partner-error
+  json.keys_under_root: true
+  tail_files: true
+
+processors:
+  - drop_fields:
+      fields: ["agent.ephemeral_id", "agent.hostname", "agent.id", "agent.type", "agent.version", "ecs.version", "input.type", "log.offset", "version"]
+
+output.kafka:
+  hosts: ["10.41.12.237:9092"]
+  topic: '%{[fields.kafka_topic]}'
+  partition.round_robin:
+    reachable_only: false
+  required_acks: 1
+  compression: gzip
+  max_message_bytes: 1000000  
+
+http.enabled: true
+http.host: 0.0.0.0

@@ -1,0 +1,11 @@
+### revenue service apis root ###
+service:
+  subscription:
+    api:
+      root: http://subscription-preprod.wcf.internal
+
+
+cors:
+  allowed:
+    origins:
+      - '*'

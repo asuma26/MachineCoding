@@ -1,0 +1,220 @@
+##### mysql database props #####
+spring:
+  datasource:
+    url: jdbc:mysql://wcf-payments-staging.cq59vpled07m.ap-south-1.rds.amazonaws.com:3306/orders
+    username: admin
+    password: o7QZ?!n=eu
+    hikari:
+      jdbc-url: jdbc:mysql://wcf-payments-staging.cq59vpled07m.ap-south-1.rds.amazonaws.com:3306/orders
+      username: admin
+      password: o7QZ?!n=eu
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      registerMbeans: true
+      auto-commit: false
+      connectionTimeout: 5000
+      idleTimeout: 10000
+      maxLifetime: 30000
+      poolName: orders-datasource-pool-local
+      minimum-idle: 10
+      maximumPoolSize: 100
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.data.cassandra.CassandraDataAutoConfiguration
+  main:
+    allow-bean-definition-overriding: true
+
+
+
+  #### JPA props ######
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    show-sql: false
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+      naming:
+        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+    properties:
+      hibernate.format_sql: false
+      hibernate.id.new_generator_mappings: true
+      hibernate.connection.provider_disables_autocommit: true
+      hibernate.cache.use_second_level_cache: false
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: false
+      hibernate.hbm2ddl.auto: validate
+      hibernate.jdbc.time_zone: UTC
+
+###### Subscription Service End Point #######
+service:
+  subscription:
+    api:
+      root: http://localhost:8080
+      endpoint:
+        allPlans: ${service.subscription.api.root}/wynk/s2s/v1/data/allPlans
+        subscribePlan: ${service.subscription.api.root}/wynk/s2s/v1/subscription/provision
+        unSubscribePlan: ${service.subscription.api.root}/wynk/s2s/v1/subscription/unprovision
+
+###### Cache Props #######
+cache:
+  enabled: true
+  mode: composite
+  ####### Redis Props #######
+  redis:
+    name: l2cache-local
+    mode: standalone
+    standalone:
+      host: 10.80.0.22
+      port: 6379
+    cache:
+      ttl: 2
+      timeunit: minutes
+      usePrefix: false
+      cacheNullValues: false
+      keyPrefix: LOCAL
+    usePooling: true
+    enableJmx: false
+    jmxPrefix: local
+    connection:
+      timeout: 1000
+      maxTotal: 200
+      minIdle: 50
+      maxIdle: 100
+  ####### Caffeine Props ######
+  caffeine:
+    metrics: true
+    nullable: false
+    eviction:
+      size:
+        initial: 10
+        maximum: 500
+      time:
+        fixed: true
+        expireAfterWrite: 1
+        expireAfterAccess: 1
+        timeunit: minutes
+########### MONGO CONFIG ###########
+wynk:
+  mongodb:
+    enabled: true
+    sources:
+      client:
+        nodes: 10.80.0.128,10.80.0.240
+        username: user_client_details
+        password: BBcUV5rsWf
+        database: client_details
+    ########### Mongo Pool Config ###########
+    minConnectionsPerHost: 1
+    maxConnectionsPerHost: 5
+    threadsAllowedToBlockForConnectionMultiplier: 5
+    serverSelectionTimeoutMs: 10000
+    maxWaitTime: 10000
+    connectTimeout: 2000
+    socketTimeout: 5000
+    readPreference: secondaryPreferred
+
+#Deferred order props
+deferred:
+  orders:
+    offset:
+      day: 1
+
+    queue:
+      name: wcf-staging-deferred-orders-scheduler
+
+    sqs:
+      producer:
+        delayInSecond: 180
+      messages:
+        extractor:
+          batchSize: 5
+          waitTimeInSeconds: 10
+
+    polling:
+      queue:
+        deferring:
+          enabled: true
+          sqs:
+            consumer:
+              delay: 20
+              delayTimeUnit: SECONDS
+
+### Rest Template props ###
+http:
+  enableTemplateRegistration: true
+  templates:
+    partnerNotifierTemplate:
+      pool:
+        connection:
+          max: 20
+          maxPerHost: 500
+          validateAfterInActivity: 100
+          timeout: 4000
+          defaultKeepAliveTime: 500
+          closeIdleWaitTime: 500
+          socket:
+            timeout: 6000
+            factory:
+              type: both
+          request:
+            timeout: 1000
+
+amazon:
+  sdk:
+    regions: ap-south-1
+
+###### Order Queue props #####
+order:
+  pooling:
+    queue:
+      placement:
+        enabled: true
+        name: wcf-staging-order-placement.fifo
+        sqs:
+          messages:
+            extractor:
+              batchSize: 5
+              waitTimeInSeconds: 2
+          consumer:
+            delay: 5
+            delayTimeUnit: SECONDS
+          producer:
+            delayInSecond: 5
+      fulfilment:
+        enabled: true
+        name: wcf-staging-order-fulfilment
+        sqs:
+          messages:
+            extractor:
+              batchSize: 5
+              waitTimeInSeconds: 2
+          consumer:
+            delay: 5
+            delayTimeUnit: SECONDS
+          producer:
+            delayInSecond: 5
+      notification:
+        enabled: true
+        name: wcf-staging-order-notification
+        sqs:
+          messages:
+            extractor:
+              batchSize: 5
+              waitTimeInSeconds: 2
+          consumer:
+            delay: 5
+            delayTimeUnit: SECONDS
+          producer:
+            delayInSecond: 5
+
+
+##### resilience props for lib-queue ######
+resilience:
+  retryProperties:
+    maxAttempts: 3
+    waitDuration: 10000
+
+
+
+
+
+

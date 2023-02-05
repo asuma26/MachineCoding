@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false" scan="true" scanPeriod="30 seconds">
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>
+                <Pattern>%level %date [%thread] [%X{rid}] [%file:%line] %msg%n</Pattern>
+            </pattern>
+        </layout>
+    </appender>
+
+    <appender name="ERRORLOG"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <encoder class="in.wynk.logging.WynkErrorEncoder"/>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>
+                ${LOG_PATH:-/tmp}/logs/targeting/error/%d{yyyy-MM-dd,
+                aux}/targeting-error.${HOSTNAME}.%d{yyyy-MM-dd}.%i.log.gz
+            </fileNamePattern>
+            <maxHistory>90</maxHistory>
+            <maxFileSize>500MB</maxFileSize>
+        </rollingPolicy>
+    </appender>
+    <appender name="ASYNC_ERRORLOG"
+              class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="ERRORLOG"/>
+        <queueSize>10000</queueSize>
+        <neverBlock>true</neverBlock>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <appender name="FILE"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%level %date [%thread] [%X{rid}] [%file:%line] %msg%n</Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH:-/tmp}/logs/targeting/app/%d{yyyy-MM-dd,
+                aux}/targeting.${HOSTNAME}.%d{yyyy-MM-dd}.%i.log.gz
+            </fileNamePattern>
+            <maxHistory>90</maxHistory>
+            <maxFileSize>500MB</maxFileSize>
+        </rollingPolicy>
+    </appender>
+    <appender name="ASYNC_FILE"
+              class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="FILE"/>
+        <queueSize>10000</queueSize>
+        <neverBlock>true</neverBlock>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <!-- logstashLogs -->
+    <appender name="ANALYTIC_LOG_FILE"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%msg%n</Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH:-/tmp}/logs/targeting/logstash/%d{yyyy-MM-dd,
+                aux}/targeting-logstash.${HOSTNAME}.%d{yyyy-MM-dd}.%i.log.gz
+            </fileNamePattern>
+            <maxHistory>90</maxHistory>
+            <maxFileSize>500MB</maxFileSize>
+        </rollingPolicy>
+    </appender>
+    <appender name="ASYNC_ANALYTIC_LOG_FILE"
+              class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="ANALYTIC_LOG_FILE"/>
+        <queueSize>10000</queueSize>
+        <neverBlock>true</neverBlock>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <logger name="s2sOldUserTargeting" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="s2sUserTargeting" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="userTargeting" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="musicUserTargeting" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="adConfig" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="adsPurge" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="bearerTokenGenerationEvent" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+    <logger name="authFailureEvent" additivity="false" level="INFO">
+        <appender-ref ref="ASYNC_ANALYTIC_LOG_FILE"/>
+    </logger>
+
+    <springProfile name="local">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ASYNC_FILE"/>
+            <appender-ref ref="ASYNC_ERRORLOG" />
+        </root>
+    </springProfile>
+
+    <springProfile name="dev,prod,preprod">
+        <root level="INFO">
+            <appender-ref ref="ASYNC_FILE"/>
+            <appender-ref ref="ASYNC_ERRORLOG" />
+        </root>
+    </springProfile>
+</configuration>

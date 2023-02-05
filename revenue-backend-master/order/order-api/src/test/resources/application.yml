@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: paymentPartner
+  profiles:
+    active: test
+    include: base-common,application-test

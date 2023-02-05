@@ -1,0 +1,77 @@
+spring:
+  application:
+    name: paymentPartner
+  profiles:
+    active: ${env}
+    include: base-common, client-core-${env}, partner-listing-${env}, order-core-${env}, order-api-${env}
+  main:
+    banner-mode: off
+  devtools:
+    add-properties: false
+  ###### SPRING AUTO-CONFIG EXCLUSION
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration,org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration,org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration,org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+  jackson:
+    default-property-inclusion: NON_NULL
+
+server:
+  port: 8081
+
+########## Management Config ##########
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,info,health,mappings,metrics,caches
+    jmx:
+      exposure:
+        exclude: '*'
+    health:
+      mongo:
+        enabled: false
+      cassandra:
+        enabled: false
+      diskspace:
+        enabled: false
+      redis:
+        enabled: false
+
+###### Subscription Service End Point #######
+
+service:
+  subscription:
+    api:
+      endpoint:
+        activePlan: ${service.subscription.api.root}/wynk/s2s/v1/plans/active
+        eligiblePlan: ${service.subscription.api.root}/wynk/s2s/v1/data/partner/plans
+        allPlans: ${service.subscription.api.root}/wynk/s2s/v1/data/allPlans
+        subscribePlan: ${service.subscription.api.root}/wynk/s2s/v1/plan/subscribe
+        unSubscribePlan: ${service.subscription.api.root}/wynk/s2s/v1/plan/unsubscribe
+        activePlanDetails: ${service.subscription.api.root}/wynk/s2s/v1/plans/active/details
+
+###### aws sdk props #######
+amazon:
+  sdk:
+    regions: ap-south-1
+
+##### resilience props for lib-queue ######
+resilience:
+  retryProperties:
+    maxAttempts: 3
+    waitDuration: 10000
+
+#### CORS props ####
+cors:
+  maxAge: 3600
+  allowed:
+    methods: GET, PUT, PATCH, POST, OPTIONS
+
+
+#### logging props ####
+logging:
+  path: /data
+  path.analytics: /logs
+
+security:
+  exempt:
+    paths: /actuator/**,/v2/api-docs,/configuration/ui,/swagger-resources/**,/configuration/security,/swagger-ui.html,/webjars/**

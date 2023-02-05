@@ -1,0 +1,22 @@
+spring:
+  profiles:
+    active: local
+  batch:
+    job:
+      enabled: false
+
+app:
+  datasource:
+    driverClassName: org.h2.Driver
+    jdbcUrl: jdbc:h2:mem:uBaseDB
+    username: admin
+    password:
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  path: /data

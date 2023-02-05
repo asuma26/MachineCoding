@@ -1,0 +1,96 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/subscription/logstash/day=*/*.log
+  fields:
+    kafka_topic: wcf-subscription
+    log_type: wcf-subscription-logs
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/subscription/error/20*/*.log
+  fields:
+    kafka_topic: wcf-subscription
+    log_type: wcf-subscription-error
+  json.keys_under_root: true
+  tail_files: true
+  
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/payment/logstash/day=*/*.log
+  fields:
+    kafka_topic: wcf-payment
+    log_type: wcf-payment-logs
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/payment/error/20*/*.log
+  fields:
+    kafka_topic: wcf-payment
+    log_type: wcf-payment-error
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/thanks-segment/logstash/20*/*.log
+  fields: 
+    kafka_topic: wcf-thanks-segment
+    log_type: wcf-thanks-segment
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/thanks-segment/error/20*/*.log
+  fields: 
+    kafka_topic: wcf-thanks-segment
+    log_type: wcf-thanks-segment-error
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/partner/logstash/20*/*.log
+  fields: 
+    kafka_topic: wcf-payment-partner
+    log_type: wcf-payment-partner
+  json.keys_under_root: true
+  tail_files: true
+
+- type: log
+  enabled: true
+  paths:
+    - /data/logs/partner/error/20*/*.log
+  fields: 
+    kafka_topic: wcf-payment-partner
+    log_type: wcf-payment-partner-error
+  json.keys_under_root: true
+  tail_files: true
+
+processors:
+  - drop_fields:
+      fields: ["agent.ephemeral_id", "agent.hostname", "agent.id", "agent.type", "agent.version", "ecs.version", "input.type", "log.offset", "version"]
+
+output.kafka:
+  hosts: ["10.41.12.237:9092"]
+  topic: '%{[fields.kafka_topic]}'
+  partition.round_robin:
+    reachable_only: false
+  required_acks: 1
+  compression: gzip
+  max_message_bytes: 1000000  
+
+http.enabled: true
+http.host: 0.0.0.0

@@ -1,0 +1,19 @@
+########### MONGO CONFIG ###########
+wynk:
+  mongodb:
+    enabled: true
+    sources:
+      client:
+        nodes: 10.80.0.128,10.80.0.240
+        username: user_client_details
+        password: BBcUV5rsWf
+        database: client_details_preprod
+    ########### Mongo Pool Config ###########
+    minConnectionsPerHost: 1
+    maxConnectionsPerHost: 5
+    threadsAllowedToBlockForConnectionMultiplier: 5
+    serverSelectionTimeoutMs: 10000
+    maxWaitTime: 10000
+    connectTimeout: 2000
+    socketTimeout: 5000
+    readPreference: secondaryPreferred

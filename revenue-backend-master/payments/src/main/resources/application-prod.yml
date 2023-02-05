@@ -1,0 +1,308 @@
+####### Properties #########
+paytm:
+  native:
+    clientId: merchant-wynk
+    merchantKey: RrGHVFOJyEjbp4hN
+    merchantId: AirBSB68537227489657
+    secret: fd13c3f9-da62-47e2-b354-8f0f18fbe90b
+    accounts:
+      baseUrl: https://accounts.paytm.com
+    services:
+      baseUrl: https://securegw.paytm.in
+    wcf:
+      addMoneyUrl: https://wcfpay-new.wynk.in/paytm-native/add-money
+      callbackUrl: https://capi.wynk.in/wynk/v2/s2s/subscription/callback?sid=
+  requesting:
+    website: WCF
+
+apb:
+  txn:
+    inquiry:
+      url: https://ecom.airtelbank.com/ecom/v2/inquiry
+  callback:
+    url: https://payments.wynk.in/wynk/v1/payment/callback/
+  merchant:
+    id:
+  salt:
+  init:
+    payment:
+      url: https://ecom.airtelbank.com/ecom/v2/initiatePayment
+
+
+###### Redis Store Props #######
+session:
+  duration: 15
+  redis:
+    name: session-store:prod
+    mode: cluster
+    usePooling: true
+    readTimeout: 1000
+    cluster:
+      nodes: wcf-redis.8hya7e.clustercfg.aps1.cache.amazonaws.com:6379
+    connection:
+      timeout: 1000
+      maxTotal: 200
+      minIdle: 50
+      maxIdle: 100
+
+###### CORS config #####
+cors:
+  allowed:
+    origins: "*"
+
+##### mysql database props #####
+spring:
+  datasource:
+    url: jdbc:mysql://wcf-payments-production.cq59vpled07m.ap-south-1.rds.amazonaws.com:3306/payments
+    username: huygens
+    password: 2dtRAHGI5OhfBj1hNkpd
+    hikari:
+      jdbc-url: jdbc:mysql://wcf-payments-production.cq59vpled07m.ap-south-1.rds.amazonaws.com:3306/payments
+      username: huygens
+      password: 2dtRAHGI5OhfBj1hNkpd
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      registerMbeans: true
+      auto-commit: false
+      connectionTimeout: 2000
+      idleTimeout: 10000
+      maxLifetime: 30000
+      poolName: payment-datasource-pool-dev
+      minimum-idle: 50
+      maximumPoolSize: 200
+
+  #### JPA props ######
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    show-sql: false
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+      naming:
+        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+    properties:
+      hibernate.format_sql: false
+      hibernate.id.new_generator_mappings: true
+      hibernate.connection.provider_disables_autocommit: true
+      hibernate.cache.use_second_level_cache: false
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: false
+      hibernate.hbm2ddl.auto: validate
+      hibernate.jdbc.time_zone: Asia/Kolkata
+
+
+
+####### payment props #######
+payment:
+  se:
+    s3:
+      bucket: wcf-logs
+  encKey: BSB$PORTAL@2014#
+  recurring:
+    offset:
+      day: 0
+      hour: 1
+  ###### lib-queue props ######
+  pooling:
+    queue:
+      reconciliation:
+        enabled: true
+        name: wcf-production-revenue-payment-reconcilation
+        sqs:
+          messages:
+            extractor:
+              batchSize: 5
+              waitTimeInSeconds: 20
+          producer:
+            delayInSecond: 600
+          consumer:
+            delay: 20
+            delayTimeUnit: SECONDS
+      renewal:
+        enabled: true
+        name: wcf-production-revenue-renewal
+        sqs:
+          messages:
+            extractor:
+              batchSize: 5
+              waitTimeInSeconds: 10
+          producer:
+            delayInSecond: 180
+          consumer:
+            delay: 20
+            delayTimeUnit: SECONDS
+      charging:
+        enabled: true
+        name: wcf-production-revenue-payment-charging.fifo
+        sqs:
+          messages:
+            extractor:
+              batchSize: 5
+              waitTimeInSeconds: 10
+          producer:
+            delayInSecond: 180
+          consumer:
+            delay: 20
+            delayTimeUnit: SECONDS
+      schedule:
+        enabled: true
+        name: wcf-production-revenue-subscription-payment
+        sqs:
+          messages:
+            extractor:
+              batchSize: 5
+              waitTimeInSeconds: 10
+          producer:
+            delayInSecond: 180
+          consumer:
+            delay: 20
+            delayTimeUnit: SECONDS
+      unschedule:
+        enabled: true
+        name: wcf-production-revenue-recurring
+        sqs:
+          messages:
+            extractor:
+              batchSize: 5
+              waitTimeInSeconds: 10
+          producer:
+            delayInSecond: 180
+          consumer:
+            delay: 20
+            delayTimeUnit: SECONDS
+  ###### webview status props #######
+  status:
+    web:
+      url: http://localhost:4200/status
+  merchant:
+    ####### payu props #########
+    payu:
+      key: aU2Uoi
+      salt: 6vbnfVtw
+      api:
+        info: https://info.payu.in/merchant/postservice.php?form=2
+      internal:
+        web:
+          url: https://wcfpay-new.wynk.in/wcf/payu
+        callback:
+          successUrl: https://payments.wynk.in/wynk/v1/payment/callback/
+          failureUrl: https://payments.wynk.in/wynk/v1/payment/callback/
+    #### Itunes props ######
+    itunes:
+      api:
+        url: https://buy.itunes.apple.com/verifyReceipt
+        alt:
+          url: https://sandbox.itunes.apple.com/verifyReceipt
+    #### AmazonIap props ######
+    amazonIap:
+      secret: 2:kjHsKYZZfkIPxwxOKaNSkZWl_6aTK1czOJANNIll40h7tyer65YZRy-Gc6MpAj3i:IS0CrRbuGNrSlRFLGkZ-jg==
+      status:
+        baseUrl: https://appstore-sdk.amazon.com/version/1.0/verifyReceiptId/developer/
+    #### PhonePe props ######
+    phonepe:
+      id: WYNK
+      api:
+        base:
+          url: https://mercury-t2.phonepe.com
+      callback:
+        url: https://payments.wynk.in/wynk/v1/payment/callback/
+      salt: 96229dff-07f5-4f92-9348-81bb7fc495b4
+
+subscription:
+  pooling:
+    queue:
+      provision:
+        enabled: true
+        name: wcf-production-revenue-subscription
+        sqs:
+          producer:
+            delayInSecond: 1
+
+####### Http Client Props #######
+http:
+  enableTemplateRegistration: true
+  templates:
+    subscriptionHttpTemplate:
+      pool:
+        connection:
+          max: 20
+          maxPerHost: 500
+          timeout: 1500
+          defaultKeepAliveTime: 500
+          closeIdleWaitTime: 500
+          validateAfterInActivity: 100
+          socket:
+            timeout: 2000
+            factory:
+              type: both
+          request:
+            timeout: 1000
+    paymentClientHttpTemplate:
+      pool:
+        connection:
+          max: 200
+          maxPerHost: 40
+          timeout: 1000
+          defaultKeepAliveTime: 30000
+          closeIdleWaitTime: 1000
+          validateAfterInActivity: 100
+          socket:
+            timeout: 1000
+            factory:
+              type: both
+          request:
+            timeout: 1000
+    paymentGatewayHttpTemplate:
+      pool:
+        connection:
+          max: 500
+          maxPerHost: 200
+          timeout: 1500
+          defaultKeepAliveTime: 30000
+          closeIdleWaitTime: 1000
+          validateAfterInActivity: 100
+          socket:
+            timeout: 3000
+            factory:
+              type: both
+          request:
+            timeout: 1000
+
+service:
+  subscription:
+    api:
+      root: http://subscription.wcf.internal
+
+webview:
+  host: https://pay.wynk.in
+
+########### MONGO CONFIG ###########
+wynk:
+  mongodb:
+    enabled: true
+    sources:
+      payment:
+        nodes: 10.40.12.162,10.40.12.216,10.40.12.45
+        username: user_payments
+        password: tHdPNyp6Du
+        database: payments
+      coupons:
+        nodes: 10.40.12.162,10.40.12.216,10.40.12.45
+        username: user_coupons
+        password: 6sSUZcp2gy
+        database: coupons
+    ########### Mongo Pool Config ###########
+    minConnectionsPerHost: 50
+    maxConnectionsPerHost: 150
+    threadsAllowedToBlockForConnectionMultiplier: 5
+    serverSelectionTimeoutMs: 10000
+    maxWaitTime: 10000
+    connectTimeout: 2000
+    socketTimeout: 5000
+    readPreference: secondaryPreferred
+
+
+######## lib-auth props #######
+security:
+  exempt:
+    paths: /actuator/**,/wynk/v1/**

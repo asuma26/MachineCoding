@@ -1,0 +1,60 @@
+spring:
+  profiles:
+    active: ${env}
+    include: base-common, subscription-core-${env} , coupon-core-${env}
+  ###### SPRING AUTO-CONFIG EXCLUSION
+  main:
+    banner-mode: off
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration,org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration,org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration,org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration,org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration
+
+  application:
+    name: revenue-utils
+###### Subscription Service End Point #######
+service:
+  subscription:
+    api:
+      endpoint:
+        thanksSegmentEndpoint: ${service.subscription.api.root}/wynk/s2s/v1/user/segments
+        activePlansEndpoint: ${service.subscription.api.root}/wynk/s2s/v1/user/active/plans
+
+server:
+  port: 8081
+
+app:
+  cors:
+    maxAge: 3600
+    allowed:
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - PATCH
+        - OPTIONS
+
+logging:
+    path: /data
+
+security:
+  exempt:
+    paths: /actuator/**,/v2/api-docs,/configuration/ui,/swagger-resources/**,/configuration/security,/swagger-ui.html,/webjars/**
+
+http:
+  enableTemplateRegistration: true
+  templates:
+    subscriptionHttpTemplate:
+      pool:
+        connection:
+          max: 20
+          maxPerHost: 5
+          timeout: 1500
+          defaultKeepAliveTime: 500
+          closeIdleWaitTime: 500
+          validateAfterInActivity: 100
+          request:
+            timeout: 1000
+          socket:
+            timeout: 2000
+            factory:
+              type: both

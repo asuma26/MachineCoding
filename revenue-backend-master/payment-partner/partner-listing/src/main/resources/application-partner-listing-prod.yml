@@ -1,0 +1,19 @@
+### Rest Template props ###
+http:
+  enableTemplateRegistration: true
+  templates:
+    subscriptionHttpTemplate:
+      pool:
+        connection:
+          max: 200
+          maxPerHost: 50
+          validateAfterInActivity: 100
+          timeout: 2000
+          defaultKeepAliveTime: 500
+          closeIdleWaitTime: 500
+          socket:
+            timeout: 3000
+            factory:
+              type: both
+          request:
+            timeout: 1000
